@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>حساب الديون</title>
+<style>
+:root{--bg:#f4f6f5;--card:#fff;--tx:#14231c;--mut:#6b7a73;--pri:#0f7a55;--pri2:#0b5c40;--bd:#e1e7e4;--red:#c0392b;--box-sizing:border-box;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0d1512;--card:#16211c;--tx:#eaf3ee;--mut:#8da097;--pri:#2bbf8a;--pri2:#1f9f72;--bd:#24332c;--red:#ff7b6b}}
+:root[data-theme="dark"]{--bg:#0d1512;--card:#16211c;--tx:#eaf3ee;--mut:#8da097;--pri:#2bbf8a;--pri2:#1f9f72;--bd:#24332c;--red:#ff7b6b}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;height:100%;background:var(--bg);color:var(--tx);font-family:system-ui,-apple-system,'Noto Sans Arabic','Noto Naskh Arabic',Roboto,Tahoma,sans-serif}
+.screen{position:fixed;inset:0;display:none;flex-direction:column;background:var(--bg);padding-top:env(safe-area-inset-top,0px)}
+.screen.on{display:flex}
+#splash{background:linear-gradient(160deg,var(--pri2),var(--pri));color:#fff;align-items:center;justify-content:center;text-align:center;z-index:9;transition:opacity .5s}
+#splash h1{font-size:34px;font-weight:800;margin:0;animation:up .8s both}
+#splash p{opacity:.85;margin:8px 0 0}
+@keyframes up{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+header{padding:18px 18px 14px;background:var(--pri);color:#fff;border-radius:0 0 22px 22px}
+header small{opacity:.85;font-size:13px}
+header h2{margin:2px 0 10px;font-size:20px}
+.sum{background:rgba(255,255,255,.16);border-radius:14px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center}
+.sum b{font-size:24px}
+#list{flex:1;overflow:auto;padding:14px 14px 110px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:14px;margin-bottom:10px}
+.row{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.nm{font-weight:800;font-size:17px}
+.dt{color:var(--mut);font-size:12px;margin-top:2px}
+.tot{color:var(--pri);font-weight:800;font-size:18px;white-space:nowrap}
+.det{display:none;margin-top:10px;border-top:1px dashed var(--bd);padding-top:10px;font-size:14px}
+.card.open .det{display:block}
+.det .row{padding:3px 0}
+.empty{text-align:center;color:var(--mut);margin-top:60px;line-height:1.9}
+button{font-family:inherit;cursor:pointer}
+.fab{position:fixed;bottom:calc(22px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);width:66px;height:66px;border-radius:50%;border:0;background:var(--pri);color:#fff;font-size:40px;line-height:1;box-shadow:0 8px 22px rgba(15,122,85,.45)}
+.btn{border:0;border-radius:12px;padding:10px 14px;font-weight:600;font-size:14px}
+.pay{background:var(--pri);color:#fff}
+.del{background:transparent;color:var(--red);border:1px solid var(--red)}
+.top{display:flex;align-items:center;gap:10px;padding:14px 16px;background:var(--pri);color:#fff}
+.top button{background:rgba(255,255,255,.2);border:0;color:#fff;border-radius:10px;font-size:20px;padding:4px 12px}
+.top h2{margin:0;font-size:18px}
+#form{flex:1;overflow:auto;padding:14px 14px 130px}
+.when{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:10px 14px;font-size:14px;color:var(--mut);margin-bottom:12px}
+.when b{color:var(--tx);display:block;font-size:15px}
+label{display:block;font-weight:600;font-size:14px;margin:12px 2px 6px}
+.inp{display:flex;gap:8px}
+input{font-family:inherit;font-size:16px;width:100%;padding:12px;border-radius:12px;border:1px solid var(--bd);background:var(--card);color:var(--tx);min-width:0}
+.mic{flex:0 0 48px;border:0;border-radius:12px;background:var(--card);border:1px solid var(--bd);font-size:20px}
+.mic.rec{background:var(--red);color:#fff;animation:p 1s infinite}
+@keyframes p{50%{opacity:.55}}
+.item{display:grid;grid-template-columns:1fr 54px 78px 24px;gap:6px;margin-bottom:8px;align-items:center}
+.item .lt{grid-column:1/-1;font-size:12px;color:var(--mut);margin-top:-4px}
+.item .x{background:none;border:0;color:var(--red);font-size:20px;padding:0}
+.hint{font-size:12px;color:var(--mut);margin:4px 2px}
+.add2{width:100%;margin-top:6px;background:transparent;border:1.5px dashed var(--pri);color:var(--pri);border-radius:12px;padding:10px;font-weight:600}
+.bar{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--bd);padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px));z-index:5}
+.bar .row{margin-bottom:10px}
+.bar b{font-size:24px;color:var(--pri)}
+.save{width:100%;padding:14px;border:0;border-radius:14px;background:var(--pri);color:#fff;font-size:17px;font-weight:800}
+#toast{position:fixed;top:70px;left:50%;transform:translateX(-50%);background:#222;color:#fff;padding:8px 16px;border-radius:20px;font-size:13px;display:none;z-index:20}
+:root{--g1:#c9efe0;--g2:#fbe6b8;--dot:rgba(15,122,85,.12)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--g1:#124a38;--g2:#3a2f0e;--dot:rgba(43,191,138,.12)}}
+:root[data-theme="dark"]{--g1:#124a38;--g2:#3a2f0e;--dot:rgba(43,191,138,.12)}
+#home,#add{background-color:var(--bg);background-image:radial-gradient(circle at 12% 8%,var(--g1) 0,transparent 48%),radial-gradient(circle at 92% 92%,var(--g2) 0,transparent 48%),radial-gradient(var(--dot) 1.6px,transparent 1.6px);background-size:auto,auto,22px 22px}
+#splash{background:linear-gradient(160deg,#0b3d5c 0%,#0f7a55 55%,#d4a017 120%)}
+header,.top{background:linear-gradient(135deg,var(--pri2),var(--pri))}
+.pay.rec{background:var(--red);animation:p 1s infinite}
+.live{min-height:22px;font-size:13px;color:var(--pri);margin:4px 2px}
+</style>
+</head>
+<body>
+
+<div id="splash" class="screen on">
+  <div><h1>أهلا هيثم مرضي</h1><p>حساب الديون</p></div>
+</div>
+
+<div id="home" class="screen">
+  <header>
+    <small>صاحب الحساب</small>
+    <h2>هيثم مرضي</h2>
+    <div class="sum"><span>إجمالي اللي على الناس</span><b id="grand">0</b></div>
+  </header>
+  <div id="list"></div>
+  <button class="fab" id="plus" aria-label="إضافة دين">+</button>
+</div>
+
+<div id="add" class="screen">
+  <div class="top"><button id="back">→</button><h2>دين جديد</h2></div>
+  <div id="form">
+    <div class="when"><span>التاريخ والوقت (من التليفون)</span><b id="now"></b></div>
+
+    <label>اسم الشخص</label>
+    <div class="inp"><input id="pname" placeholder="اكتب الاسم أو اضغط الميكروفون" autocomplete="off"><button class="mic" data-t="name">🎤</button></div>
+
+    <label>الحاجات اللي أخدها</label>
+    <div class="inp" style="margin-bottom:6px"><button class="btn pay" id="vitem" style="flex:1">🎤 ابدأ الكلام وأضيف الأصناف بصوتك</button></div>
+    <div class="hint">اضغط مرة وكمّل كلام: «سكر 50 وزيت 80 و2 رز 30» (الرقم قبل الاسم = الكمية). اضغط تاني للإيقاف.</div><div class="live" id="live"></div>
+    <div id="items" style="margin-top:8px"></div>
+    <button class="add2" id="addrow">+ إضافة حاجة يدوي</button>
+  </div>
+  <div class="bar">
+    <div class="row"><span>الإجمالي</span><b id="total">0</b></div>
+    <button class="save" id="save">حفظ الدين</button>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+var OWNER='هيثم مرضي', KEY='debts_v1', debts=[], items=[];
+var $=function(i){return document.getElementById(i)};
+try{debts=JSON.parse(localStorage.getItem(KEY)||'[]')}catch(e){debts=[]}
+function persist(){try{localStorage.setItem(KEY,JSON.stringify(debts))}catch(e){}}
+function show(id){document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('on')});$(id).classList.add('on')}
+function toast(t){var e=$('toast');e.textContent=t;e.style.display='block';setTimeout(function(){e.style.display='none'},2200)}
+function en(s){return String(s).replace(/[٠-٩]/g,function(d){return d.charCodeAt(0)-1632})}
+function fmt(n){return (Math.round(n*100)/100).toLocaleString('ar-EG')+' ج'}
+function fdate(d){return new Date(d).toLocaleString('ar-EG',{weekday:'long',day:'numeric',month:'long',year:'numeric',hour:'numeric',minute:'2-digit'})}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+
+setTimeout(function(){$('splash').style.opacity=0;setTimeout(function(){show('home');render()},500)},4000);
+
+function render(){
+  var g=0,h='';
+  debts.forEach(function(d){g+=d.total});
+  $('grand').textContent=fmt(g);
+  if(!debts.length)h='<div class="empty">مفيش ديون متسجلة 👌<br>اضغط على + عشان تضيف أول دين</div>';
+  debts.forEach(function(d,i){
+    h+='<div class="card" data-i="'+i+'"><div class="row"><div><div class="nm">'+esc(d.name)+'</div><div class="dt">'+fdate(d.date)+'</div></div><div class="tot">'+fmt(d.total)+'</div></div>'+
+    '<div class="det">'+d.items.map(function(x){return '<div class="row"><span>'+esc(x.n)+' × '+x.q+'</span><span>'+fmt(x.q*x.p)+'</span></div>'}).join('')+
+    '<div class="row" style="margin-top:10px;justify-content:flex-start"><button class="btn pay" data-a="paid" data-i="'+i+'">تم السداد ✓</button><button class="btn del" data-a="del" data-i="'+i+'">حذف</button></div></div></div>';
+  });
+  $('list').innerHTML=h;
+}
+$('list').addEventListener('click',function(e){
+  var b=e.target.closest('button');
+  if(b){var i=+b.dataset.i;if(confirm(b.dataset.a==='paid'?'تأكيد السداد وحذف الدين؟':'حذف الدين؟')){debts.splice(i,1);persist();render()}return}
+  var c=e.target.closest('.card');if(c)c.classList.toggle('open');
+});
+
+var clock;
+function tick(){$('now').textContent=fdate(new Date())}
+$('plus').onclick=function(){items=[{n:'',q:1,p:''}];$('pname').value='';drawItems();tick();clock=setInterval(tick,1000);show('add')};
+$('back').onclick=function(){stopV();clearInterval(clock);show('home')};
+
+function drawItems(){
+  $('items').innerHTML=items.map(function(x,i){
+    return '<div class="item"><input data-i="'+i+'" data-f="n" placeholder="الصنف" value="'+esc(x.n)+'"><input data-i="'+i+'" data-f="q" type="number" inputmode="decimal" min="0" value="'+x.q+'"><input data-i="'+i+'" data-f="p" type="number" inputmode="decimal" min="0" placeholder="السعر" value="'+x.p+'"><button class="x" data-i="'+i+'">×</button><div class="lt" id="lt'+i+'">'+(x.p?'= '+fmt(x.q*x.p):'')+'</div></div>';
+  }).join('');
+  calc();
+}
+function calc(){var t=0;items.forEach(function(x){t+=(+x.q||0)*(+x.p||0)});$('total').textContent=fmt(t);return t}
+$('items').addEventListener('input',function(e){
+  var t=e.target,i=t.dataset.i;if(i==null)return;
+  items[i][t.dataset.f]=t.value;
+  var l=$('lt'+i);if(l)l.textContent=items[i].p?'= '+fmt((+items[i].q||0)*(+items[i].p||0)):'';
+  calc();
+});
+$('items').addEventListener('click',function(e){
+  if(e.target.classList.contains('x')){items.splice(+e.target.dataset.i,1);if(!items.length)items=[{n:'',q:1,p:''}];drawItems()}
+});
+$('addrow').onclick=function(){items.push({n:'',q:1,p:''});drawItems()};
+
+var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+var NATIVE=(window.Capacitor&&Capacitor.isNativePlatform&&Capacitor.isNativePlatform())?Capacitor.registerPlugin('SpeechRecognition'):null,nlast='',nbound=false;
+function nativeToggle(b){
+  if(vact){stopV();return}
+  NATIVE.requestPermissions().then(function(p){
+    if(p.speechRecognition!=='granted'){toast('اسمح للميكروفون من إعدادات التطبيق');return}
+    vact=true;b.classList.add('rec');b.textContent='⏹ بسمعك… اضغط للإيقاف';
+    if(!nbound){nbound=true;
+      NATIVE.addListener('partialResults',function(d){nlast=en((d.matches&&d.matches[0])||'');$('live').textContent=nlast});
+      NATIVE.addListener('listeningState',function(s){if(s.status==='stopped'){if(nlast){addParsed(nlast);nlast=''}$('live').textContent='';if(vact)setTimeout(nrun,300)}});
+    }
+    nrun();
+  }).catch(function(){toast('الميكروفون مش متاح')});
+}
+function nrun(){if(!vact)return;NATIVE.start({language:'ar-EG',maxResults:1,partialResults:true,popup:false}).catch(function(){if(vact)setTimeout(nrun,1000)})}
+function listen(btn,cb){
+  if(NATIVE){
+    NATIVE.requestPermissions().then(function(p){
+      if(p.speechRecognition!=='granted'){toast('اسمح للميكروفون من إعدادات التطبيق');return}
+      btn.classList.add('rec');
+      return NATIVE.start({language:'ar-EG',maxResults:1,popup:true}).then(function(r){btn.classList.remove('rec');if(r&&r.matches&&r.matches[0])cb(en(r.matches[0]))});
+    }).catch(function(){btn.classList.remove('rec');toast('مقدرتش أسمعك، جرب تاني')});
+    return;
+  }
+  if(!SR){toast('المتصفح ده مش بيدعم الكلام الصوتي');return}
+  var r=new SR();r.lang='ar-EG';r.interimResults=false;
+  btn.classList.add('rec');
+  r.onresult=function(e){cb(en(e.results[0][0].transcript.trim()))};
+  r.onerror=function(){toast('مقدرتش أسمعك، جرب تاني')};
+  r.onend=function(){btn.classList.remove('rec')};
+  try{r.start()}catch(e){btn.classList.remove('rec')}
+}
+document.querySelector('.mic').onclick=function(){var b=this;listen(b,function(t){$('pname').value=t})};
+var oldV=function(){
+  var b=this;
+  listen(b,function(t){
+    var m=t.match(/(\d+(?:[.,]\d+)?)\s*(?:جنيه|ج)?\s*$/),p='',n=t;
+    if(m){p=m[1].replace(',','.');n=t.slice(0,m.index).trim()}
+    var last=items[items.length-1];
+    if(items.length===1&&!last.n&&!last.p)items=[];
+    items.push({n:n,q:1,p:p});drawItems();toast('اتضافت: '+n+(p?' — '+p:''));
+  });
+};
+
+var vact=false,vrec=null;
+function stopV(){vact=false;try{vrec&&vrec.stop()}catch(e){}try{NATIVE&&NATIVE.stop()}catch(e){}var b=$('vitem');b.classList.remove('rec');b.textContent='🎤 ابدأ الكلام وأضيف الأصناف بصوتك';$('live').textContent=''}
+function addParsed(t){
+  var re=/(?:(\d+(?:\.\d+)?)\s+)?([^\d]+?)\s*(\d+(?:\.\d+)?)\s*(?:جنيه|جنيها|جنية)?/g,m,c=0,end=0,add=[];
+  while((m=re.exec(t))){
+    end=re.lastIndex;
+    var n=m[2].replace(/[،,]/g,' ').replace(/^\s*(?:وبعدين|بعدين|وكمان|كمان|و)\s+/,'').trim();
+    if(!n)continue;
+    add.push({n:n,q:m[1]||1,p:m[3]});
+  }
+  var rest=t.slice(end).replace(/[،,]/g,' ').replace(/^\s*(?:وبعدين|بعدين|وكمان|كمان|و)\s+/,'').trim();
+  if(/[\u0600-\u06FFa-zA-Z]/.test(rest))add.push({n:rest,q:1,p:''});
+  if(!add.length)return;
+  if(items.length===1&&!items[0].n&&!items[0].p)items=[];
+  items=items.concat(add);drawItems();
+  toast('اتضاف '+add.length+(add.length>2?' أصناف':' صنف'));
+  var f=$('form');f.scrollTop=f.scrollHeight;
+}
+$('vitem').onclick=function(){
+  if(NATIVE){nativeToggle(this);return}
+  if(!SR){toast('المتصفح ده مش بيدعم الكلام الصوتي');return}
+  if(vact){stopV();return}
+  vact=true;this.classList.add('rec');this.textContent='⏹ بسمعك… اضغط للإيقاف';
+  function go(){
+    vrec=new SR();vrec.lang='ar-EG';vrec.continuous=true;vrec.interimResults=true;
+    vrec.onresult=function(e){
+      var live='';
+      for(var i=e.resultIndex;i<e.results.length;i++){
+        var tx=en(e.results[i][0].transcript);
+        if(e.results[i].isFinal)addParsed(tx);else live+=tx;
+      }
+      $('live').textContent=live;
+    };
+    vrec.onerror=function(ev){if(ev.error==='not-allowed'||ev.error==='service-not-allowed'){stopV();toast('اسمح للميكروفون من الإعدادات')}};
+    vrec.onend=function(){if(vact){try{go()}catch(e){stopV()}}};
+    vrec.start();
+  }
+  try{go()}catch(e){stopV()}
+};
+$('save').onclick=function(){stopV();
+  var name=$('pname').value.trim();
+  var clean=items.filter(function(x){return x.n.trim()&&(+x.p)>0}).map(function(x){return {n:x.n.trim(),q:+x.q||1,p:+x.p}});
+  if(!name){toast('اكتب اسم الشخص');return}
+  if(!clean.length){toast('اكتب حاجة واحدة على الأقل مع سعرها');return}
+  var t=0;clean.forEach(function(x){t+=x.q*x.p});
+  debts.unshift({name:name,items:clean,total:t,date:new Date().toISOString()});
+  persist();clearInterval(clock);render();show('home');toast('تم الحفظ ✓');
+};
+</script>
+</body>
+</html>
