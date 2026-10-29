@@ -1,0 +1,6 @@
+{
+  "appId": "com.haitham.debts",
+  "appName": "حساب الديون",
+  "webDir": "www",
+  "server": { "androidScheme": "https" }
+}
